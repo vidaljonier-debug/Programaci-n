@@ -11,6 +11,13 @@ const sortableFields = {
     updatedAt: "m.updated_at"
 }
 
+  /**
+   * Normaliza el campo y la dirección de ordenamiento usados por la consulta SQL.
+   *
+   * @param {string} sort - Campo solicitado para ordenar.
+   * @param {string} order - Dirección del ordenamiento.
+   * @returns {string} Expresión SQL segura para ordenar resultados.
+   */
 function normalizeSort(sort, order){
 
     const column = sortableFields[sort] || sortableFields.nombre;
@@ -19,6 +26,12 @@ function normalizeSort(sort, order){
 
 }
 
+/**
+ * Convierte una fila de base de datos al modelo público de materia.
+ *
+ * @param {Object} row - Fila devuelta por la base de datos.
+ * @returns {Object} Materia normalizada.
+ */
 function mapMateria(row) {
   return {
     id: row.id,
@@ -33,6 +46,15 @@ function mapMateria(row) {
   };
 }
 
+/**
+ * Busca las materias de un usuario aplicando filtros, orden y paginación.
+ *
+ * @async
+ * @function findAllByUserId
+ * @param {string|number} userId - Identificador del usuario propietario.
+ * @param {Object} [filters={}] - Filtros de búsqueda y paginación.
+ * @returns {Promise<{materias: Object[], total: number}>} Materias y total de registros.
+ */
 export async function findAllByUserId(userId, filters = {}) {
 
   const conditions = ["m.id_usuario = ?"];
@@ -93,6 +115,15 @@ export async function findAllByUserId(userId, filters = {}) {
   };
 }
 
+/**
+ * Busca una materia por identificador y usuario propietario.
+ *
+ * @async
+ * @function findByIdAndUserId
+ * @param {string|number} id - Identificador de la materia.
+ * @param {string|number} userId - Identificador del usuario propietario.
+ * @returns {Promise<Object|null>} Materia encontrada o null.
+ */
 export async function findByIdAndUserId(id, userId) {
 
   const [rows] = await pool.execute(
@@ -117,6 +148,37 @@ export async function findByIdAndUserId(id, userId) {
   return rows[0] ? mapMateria(rows[0]) : null;
 }
 
+/**
+ * Obtiene las tareas creadas para una materia perteneciente a un usuario.
+ *
+ * @async
+ * @function findTasksByMateriaIdAndUserId
+ * @param {string|number} materiaId - Identificador de la materia.
+ * @param {string|number} userId - Identificador del usuario propietario.
+ * @returns {Promise<Object[]>} Tareas asociadas a la materia.
+ */
+export async function findTasksByMateriaIdAndUserId(materiaId, userId) {
+  const [rows] = await pool.execute(
+    `SELECT t.*
+     FROM tarea t
+     INNER JOIN materia m ON m.id_materia = t.id_materia
+     WHERE t.id_materia = ? AND m.id_usuario = ?
+     ORDER BY t.created_at DESC`,
+    [materiaId, userId]
+  );
+
+  return rows;
+}
+
+/**
+ * Inserta una materia y devuelve el registro creado.
+ *
+ * @async
+ * @function createMateria
+ * @param {string|number} userId - Identificador del usuario propietario.
+ * @param {Object} materia - Datos de la materia.
+ * @returns {Promise<Object>} Materia creada.
+ */
 export async function createMateria(userId, materia) {
   const [result] = await pool.execute(
     `INSERT INTO materia (id_usuario, nombre, codigo, color, creditos, activa)
@@ -134,6 +196,16 @@ export async function createMateria(userId, materia) {
   return findByIdAndUserId(result.insertId, userId);
 }
 
+/**
+ * Comprueba si existe un código para un usuario.
+ *
+ * @async
+ * @function existsByCode
+ * @param {string|number} userId - Identificador del usuario.
+ * @param {string} codigo - Código que se desea comprobar.
+ * @param {string|number} [excludeId] - ID que se excluye de la comprobación.
+ * @returns {Promise<boolean>} true si el código ya existe.
+ */
 export async function existsByCode(userId, codigo, excludeId) {
   const params = [userId, codigo];
   let sql = "SELECT 1 FROM materia WHERE id_usuario = ? AND codigo = ?";
@@ -149,6 +221,16 @@ export async function existsByCode(userId, codigo, excludeId) {
   return rows.length > 0;
 }
 
+/**
+ * Comprueba si existe un nombre para un usuario.
+ *
+ * @async
+ * @function existsByName
+ * @param {string|number} userId - Identificador del usuario.
+ * @param {string} nombre - Nombre que se desea comprobar.
+ * @param {string|number} [excludeId] - ID que se excluye de la comprobación.
+ * @returns {Promise<boolean>} true si el nombre ya existe.
+ */
 export async function existsByName(userId, nombre, excludeId) {
   const params = [userId, nombre];
   let sql = "SELECT 1 FROM materia WHERE id_usuario = ? AND nombre = ?";
@@ -164,6 +246,16 @@ export async function existsByName(userId, nombre, excludeId) {
   return rows.length > 0;
 }
 
+/**
+ * Actualiza parcialmente una materia.
+ *
+ * @async
+ * @function patchMateria
+ * @param {string|number} id - Identificador de la materia.
+ * @param {string|number} userId - Identificador del usuario propietario.
+ * @param {Object} partialMateria - Campos que se actualizarán.
+ * @returns {Promise<Object>} Materia actualizada.
+ */
 export async function patchMateria(id, userId, partialMateria) {
   const fields = [];
   const params = [];
@@ -209,6 +301,15 @@ export async function patchMateria(id, userId, partialMateria) {
   return findByIdAndUserId(id, userId);
 }
 
+/**
+ * Elimina una materia de un usuario.
+ *
+ * @async
+ * @function deleteMateria
+ * @param {string|number} id - Identificador de la materia.
+ * @param {string|number} userId - Identificador del usuario propietario.
+ * @returns {Promise<boolean>} true si se eliminó una materia.
+ */
 export async function deleteMateria(id, userId) {
   const [result] = await pool.execute(
     "DELETE FROM materia WHERE id_materia = ? AND id_usuario = ?",
@@ -218,6 +319,16 @@ export async function deleteMateria(id, userId) {
   return result.affectedRows > 0;
 }
 
+/**
+ * Reemplaza todos los campos de una materia.
+ *
+ * @async
+ * @function updateMateria
+ * @param {string|number} id - Identificador de la materia.
+ * @param {string|number} userId - Identificador del usuario propietario.
+ * @param {Object} materia - Datos completos de la materia.
+ * @returns {Promise<Object>} Materia actualizada.
+ */
 export async function updateMateria(id, userId, materia) {
   await pool.execute(
     `UPDATE materia

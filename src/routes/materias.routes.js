@@ -4,6 +4,7 @@ import {
 
     listMaterias,
     getMateriaById,
+    listTasksByMateriaId,
     createMateria,
     replaceMateria,
     updateMateria,
@@ -16,6 +17,7 @@ const router = Router();
 //http://localhost:3000/api/v1/materias
 
 router.get("/", listMaterias);
+router.get("/:id/tareas", listTasksByMateriaId);
 router.get("/:id", getMateriaById);
 router.post("/", createMateria);
 router.put("/:id", replaceMateria);
