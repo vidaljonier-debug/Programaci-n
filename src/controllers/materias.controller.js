@@ -71,6 +71,26 @@ export async function listTasksByMateriaId(request, response, next) {
 }
 
 /**
+ * Atiende la consulta de los eventos de una materia.
+ *
+ * @async
+ * @function listEventosByMateria
+ * @param {import("express").Request} request - Solicitud HTTP.
+ * @param {import("express").Response} response - Respuesta HTTP.
+ * @param {import("express").NextFunction} next - Siguiente middleware.
+ * @returns {Promise<import("express").Response|void>} Respuesta con los eventos.
+ */
+export async function listEventosByMateria(request, response, next) {
+  try {
+    const id = validateMateriaId(request.params.id);
+    const eventos = await materiasService.listEventosByMateria(id, request.user.id);
+    return sendSuccess(response, eventos);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
  * Atiende la creación de una materia.
  *
  * @async

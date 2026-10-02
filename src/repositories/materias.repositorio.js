@@ -171,6 +171,30 @@ export async function findTasksByMateriaIdAndUserId(materiaId, userId) {
 }
 
 /**
+ * Obtiene los eventos creados para una materia perteneciente a un usuario.
+ *
+ * @async
+ * @function findEventosByMateriaAndUserId
+ * @param {string|number} id - Identificador de la materia.
+ * @param {string|number} userId - Identificador del usuario propietario.
+ * @returns {Promise<Object[]>} Eventos asociados a la materia.
+ */
+export async function findEventosByMateriaAndUserId(id, userId) {
+  const [rows] = await pool.execute(
+    `SELECT
+       e.id_evento AS id,
+       e.id_materia AS materiaId,
+       e.hora_inicio AS horaInicio
+     FROM evento e
+     INNER JOIN materia m ON m.id_materia = e.id_materia
+     WHERE m.id_materia = ? AND m.id_usuario = ?`,
+    [id, userId]
+  );
+
+  return rows;
+}
+
+/**
  * Inserta una materia y devuelve el registro creado.
  *
  * @async

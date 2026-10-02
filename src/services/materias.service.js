@@ -61,6 +61,21 @@ export async function listTasksByMateriaId(materiaId, userId) {
 }
 
 /**
+ * Obtiene los eventos asociados a una materia del usuario.
+ *
+ * @async
+ * @function listEventosByMateria
+ * @param {string|number} id - Identificador de la materia.
+ * @param {string|number} userId - Identificador del usuario propietario.
+ * @returns {Promise<Object[]>} Eventos creados para la materia.
+ * @throws {HttpError} Código 404 si la materia no existe o no pertenece al usuario.
+ */
+export async function listEventosByMateria(id, userId) {
+  await getMateriaById(id, userId);
+  return materiasRepository.findEventosByMateriaAndUserId(id, userId);
+}
+
+/**
  * Crea una materia para un usuario.
  *
  * @async
@@ -155,4 +170,3 @@ export async function removeMateria(id, userId) {
   await getMateriaById(id, userId);
   await materiasRepository.deleteMateria(id, userId);
 }
-
