@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start StudentFlow backend",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"src/server.js"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}
