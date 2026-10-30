@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Consulta y administra tus recordatorios de StudentFlow.">
+    <title>StudentFlow · Recordatorios</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/recordatorios.css">
+    <script type="module" src="./js/pages/recordatorios.js"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">StudentFlow / Recordatorios</p>
+        <h1>Listado de recordatorios</h1>
+        <p>Consulta y administra tus recordatorios asociados a tareas y materias.</p>
+        <nav class="page-actions" aria-label="Acciones">
+          <a class="action-link" href="#recordatorios">Listar</a>
+          <a class="action-link" href="#consulta">Consultar uno</a>
+          <a class="action-link" href="#formulario">Crear</a>
+          <button id="health-button" class="secondary" type="button">Estado del servicio</button>
+        </nav>
+      </header>
+
+      <section id="recordatorios" class="panel list-panel" aria-labelledby="list-title">
+        <div class="section-heading">
+          <div>
+            <h2 id="list-title">Mis recordatorios</h2>
+            <p class="muted">Busca por mensaje, tarea o materia; ordena y filtra tus resultados.</p>
+          </div>
+          <button id="refresh-button" type="button">Actualizar listado</button>
+        </div>
+        <form id="filters-form" class="filters">
+          <label>
+            Buscar
+            <input id="search-filter" type="search" maxlength="255" placeholder="Mensaje, tarea o materia">
+          </label>
+          <label>
+            Lectura
+            <select id="read-filter">
+              <option value="">Todos</option>
+              <option value="false">No leídos</option>
+              <option value="true">Leídos</option>
+            </select>
+          </label>
+          <label>
+            Ordenar por
+            <select id="sort-filter">
+              <option value="fechaHora">Fecha y hora</option>
+              <option value="mensaje">Mensaje</option>
+              <option value="canal">Canal</option>
+              <option value="leido">Leído</option>
+              <option value="id">ID</option>
+            </select>
+          </label>
+          <label>
+            Dirección
+            <select id="order-filter">
+              <option value="asc">Ascendente</option>
+              <option value="desc">Descendente</option>
+            </select>
+          </label>
+          <button type="submit" class="secondary">Aplicar filtros</button>
+        </form>
+        <p id="list-status" class="status-message" role="status" aria-live="polite"></p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Tarea</th>
+                <th scope="col">Materia</th>
+                <th scope="col">Mensaje</th>
+                <th scope="col">Fecha y hora</th>
+                <th scope="col">Canal</th>
+                <th scope="col">Leído</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="recordatorios-body"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <p id="page-summary" class="muted">Sin resultados cargados.</p>
+          <div class="page-buttons">
+            <button id="previous-page" class="secondary" type="button" disabled>Anterior</button>
+            <button id="next-page" class="secondary" type="button" disabled>Siguiente</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="lower-grid">
+        <section id="formulario" class="panel" aria-labelledby="form-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="form-title">Crear recordatorio</h2>
+              <p id="form-help" class="muted">Los datos se guardan en la tabla de recordatorios.</p>
+            </div>
+            <button id="new-button" class="secondary" type="button" hidden>Nuevo</button>
+          </div>
+          <form id="recordatorio-form">
+            <input id="recordatorio-id" type="hidden">
+            <label for="task-id">Tarea</label>
+            <div class="field-with-patch">
+              <select id="task-id" required></select>
+              <label class="patch-option" hidden><input type="checkbox" data-patch-field="tareaId"> Aplicar</label>
+            </div>
+
+            <label for="reminder-message">Mensaje</label>
+            <div class="field-with-patch">
+              <input id="reminder-message" type="text" maxlength="255" required>
+              <label class="patch-option" hidden><input type="checkbox" data-patch-field="mensaje"> Aplicar</label>
+            </div>
+
+            <label for="reminder-date">Fecha y hora</label>
+            <div class="field-with-patch">
+              <input id="reminder-date" type="datetime-local" required>
+              <label class="patch-option" hidden><input type="checkbox" data-patch-field="fechaHora"> Aplicar</label>
+            </div>
+
+            <label for="reminder-channel">Canal</label>
+            <div class="field-with-patch">
+              <select id="reminder-channel" required>
+                <option value="in_app">Notificación en la aplicación</option>
+                <option value="email">Correo electrónico</option>
+              </select>
+              <label class="patch-option" hidden><input type="checkbox" data-patch-field="canal"> Aplicar</label>
+            </div>
+
+            <div class="field-with-patch read-field">
+              <label for="reminder-read" class="check-label">
+                <input id="reminder-read" type="checkbox">
+                Marcado como leído
+              </label>
+              <label class="patch-option" hidden><input type="checkbox" data-patch-field="leido"> Aplicar</label>
+            </div>
+
+            <p id="patch-help" class="muted" hidden>Para PATCH, marca “Aplicar” únicamente en los campos que quieras cambiar.</p>
+            <div class="form-actions">
+              <button id="save-button" type="submit">Crear recordatorio</button>
+              <button id="patch-button" class="secondary" type="button" hidden>Actualizar campos (PATCH)</button>
+            </div>
+          </form>
+          <p id="form-status" class="status-message" role="status" aria-live="polite"></p>
+        </section>
+
+        <section id="consulta" class="panel" aria-labelledby="consult-title">
+          <h2 id="consult-title">Consultar uno</h2>
+          <p class="muted">Busca un recordatorio propio por su identificador.</p>
+          <form id="consult-form" class="consult-form">
+            <label for="consult-id">ID del recordatorio</label>
+            <input id="consult-id" type="number" min="1" step="1" required>
+            <button type="submit">Consultar</button>
+          </form>
+          <p id="consult-status" class="status-message" role="status" aria-live="polite"></p>
+          <pre id="consult-result" class="result-box">La respuesta aparecerá aquí.</pre>
+        </section>
+      </div>
+      <footer>Las tareas y materias se consultan para mostrar el contexto; solo se modifican recordatorios.</footer>
+    </main>
+  </body>
+</html>

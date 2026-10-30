@@ -49,11 +49,14 @@ studentFlow_front/
         http.js                   Fetch, errores, filtros y respuesta 204
         health.js                 Estado del backend
         materias.js               Seis funciones del CRUD de materias
+        recordatorios.js          API de recordatorios y tareas asociables
       examples/
         datos.js                  Payloads editables de ejemplo
         endpoints.js              Ejemplo ejecutable de cada endpoint
       pages/
         pruebas.js                Eventos y presentación de la página de prueba
+        recordatorios.js          Listado y operaciones de recordatorios
+    recordatorios.html            Página para consultar y administrar recordatorios
   tests/api.test.js               Pruebas del cliente con respuestas simuladas
 ```
 
@@ -70,6 +73,15 @@ Todas las rutas parten de `/api/v1`.
 | `reemplazarMateria(id, datos)` | PUT | `/materias/:id` | `{ success, data: materia }` |
 | `actualizarMateria(id, cambios)` | PATCH | `/materias/:id` | `{ success, data: materia }` |
 | `eliminarMateria(id)` | DELETE | `/materias/:id` | `null`, HTTP 204 sin cuerpo |
+| `listarRecordatorios(filtros)` | GET | `/recordatorios` | Lista filtrada y paginada |
+| `listarTareasRecordatorio()` | GET | `/recordatorios/tareas` | Tareas propias para asociar |
+| `obtenerRecordatorio(id)` | GET | `/recordatorios/:id` | Consulta un recordatorio propio |
+| `crearRecordatorio(datos)` | POST | `/recordatorios` | Crea y devuelve el recordatorio, HTTP 201 |
+| `reemplazarRecordatorio(id, datos)` | PUT | `/recordatorios/:id` | Reemplaza los campos editables |
+| `actualizarRecordatorio(id, cambios)` | PATCH | `/recordatorios/:id` | Actualiza solo los campos enviados |
+| `eliminarRecordatorio(id)` | DELETE | `/recordatorios/:id` | `null`, HTTP 204 sin cuerpo |
+
+La página de gestión se abre en **http://127.0.0.1:5500/recordatorios.html**. En ella puedes filtrar y paginar el listado, consultar un registro y crear, reemplazar, actualizar parcialmente o eliminar recordatorios. Las tareas y materias se consultan para mostrar su relación; esta funcionalidad solo escribe en la tabla `recordatorio`.
 
 Filtros del listado:
 
